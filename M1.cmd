@@ -1,0 +1,5 @@
+
+SECTIONS
+{
+	MYDRIVE > 0xD000
+}

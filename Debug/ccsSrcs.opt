@@ -1,0 +1,1 @@
+"../ADXL.c" "../AndyMscFseData32kEEPROM.c" "../MSC_DaysimMain.c" "../eeprom.c" "../i2c.c" "../log.c" "../opticalsensor.c" "../timers.c" "../usbConstructs.c" "../usbEventHandling.c" 
