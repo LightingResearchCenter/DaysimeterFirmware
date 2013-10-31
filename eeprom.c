@@ -1,5 +1,6 @@
 //This handles the basic EEPROM functions
 // Revised by A Bierman 03Apr2013
+// Revised by A Bierman 19Aug2013  Lines 156, 191: Hours logging updated every 24 hours not every hour
 
 #include "i2c.h"
 #include "eeprom.h"
@@ -152,7 +153,7 @@ void eepromNum2Ascii(int number, int lineNum){
 //this writes a log
 void eepromLog() {
 	//keep track of number of hours used on this battery
-	if((eepromAddress % (28800/eepromPeriod)) == 0) {
+	if((eepromAddress % (691200/(long int)eepromPeriod)) == 0) { // 28800 = every hour, 691200 = every day
 		logBatteryHours();
 	}
 
@@ -187,7 +188,7 @@ void logBatteryHours() {
 void logBatteryHours() {
 	int hours;
 
-	 hours = eepromAscii2Num(5) + 1;
+	 hours = eepromAscii2Num(5) + 24; // was 1 for write to EEPROM every hour, now 24 when writing to EEPROM once every 24 hours
 	 eepromNum2Ascii(hours, 5);
 }
 

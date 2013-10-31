@@ -3,6 +3,9 @@
 // August 2012
 // Revised 21-Sep-2012
 // Revised 03-Apr-2013  rangeFlag added to prevent 16-bit rollover, high range values divided by 10
+// Revised 19-Aug-2013  USBMSC_registerBufInfo() instruction placed after USBMSC_updateMediaInfo() (approx. line 136 in main())
+//						BatteryVoltage() instructions occur only if not logging (in usbEventHandling and in case ST_USB_DISCONNECTED in main().
+//                      Battery use update occurs once per day instead of every hour
 
 #include "USB_API/USB_Common/device.h"
 #include "USB_API/USB_Common/types.h"          
@@ -112,14 +115,7 @@ VOID main(VOID)
 
     // Enable all USB events
     USB_setEnabledEvents(kUSB_allUsbEvents);
-
-    
-    // The data interchange buffer (used when handling SCSI READ/WRITE) is declared by the application, and 
-    // registered with the API using this function.  This allows it to be assigned dynamically, giving 
-    // the application more control over memory management.  
-    USBMSC_registerBufInfo(0, &RW_dataBuf[0], NULL, sizeof(RW_dataBuf));
    
-    
     // The API maintains an instance of the USBMSC_RWbuf_Info structure.  If double-buffering were used, it would
     // maintain one for both the X and Y side.  (This version of the API only supports single-buffering,
     // so only one structure is maintained.)  This is a shared resource between the API and application; the 
@@ -140,6 +136,11 @@ VOID main(VOID)
     mediainfo.bytesPerBlock = BYTES_PER_BLOCK; // 512 bytes per block. (This number is also found in the volume itself; see mscFseData.c. They should match.)
     USBMSC_updateMediaInfo(0, &mediainfo); 
     
+    // The data interchange buffer (used when handling SCSI READ/WRITE) is declared by the application, and
+    // registered with the API using this function.  This allows it to be assigned dynamically, giving
+    // the application more control over memory management.
+    USBMSC_registerBufInfo(0, &RW_dataBuf[0], NULL, sizeof(RW_dataBuf));
+
     // If USB is already connected when the program starts up, then there won't be a USB_handleVbusOnEvent(). 
     // So we need to check for it, and manually connect if the host is already present.
     wdReset_1000();
@@ -205,6 +206,7 @@ VOID main(VOID)
                 if (logFlag == 0) { 	// if usbVbusOnEvent ocurred during log
                 	//wdOff();
                 	taStop();
+                	BatteryVoltage();  // read battery voltage and store to line 7 of log_info.txt
                 	if (USB_enable() == kUSB_succeed){
                 		//int i = 0;
                 		//for(;i<10000;i++); // try a delay here

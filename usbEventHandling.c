@@ -69,13 +69,15 @@ BYTE USB_handleVbusOnEvent ()
 	// Stop timerA
 	// wdOff();
 	wdReset_1000();
-	taStop();
+	//taStop();
 	USBtiming = 1;
-	BatteryVoltage();  // read battery voltage and store to line 7 of log_info.txt
+	//BatteryVoltage();  // read battery voltage and store to line 7 of log_info.txt
 
     //We switch on USB and connect to the BUS
 	if ((USB_enable() == kUSB_succeed) && (logFlag == 0)){
     // if (USB_enable() == kUSB_succeed){
+		taStop();
+		BatteryVoltage();  // read battery voltage and store to line 7 of log_info.txt
         USB_reset();
         int i = 0;
         for(;i<10000;i++); // try a delay here
